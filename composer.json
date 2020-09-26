@@ -1,0 +1,36 @@
+{
+    "name": "dankerizer/rajaongkir",
+    "description": "RajaOngkir PHP Client API",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hadie Danker",
+            "email": "hadie87@gmail.com",
+            "role" : "Developer"
+        },
+        {
+            "name": "Theme.id",
+            "email": "halo@theme.id",
+            "role" : "Maintaner"
+        }
+    ],
+
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dankerizer\\RajaOngkir\\": "src"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "watch": "vendor/bin/phpunit-watcher"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
