@@ -79,27 +79,33 @@ class RajaOngkir
             'rpx',
         ],
         'pro' => [
-            'jne',
-            'pos',
-            'tiki',
-            'rpx',
-            'esl',
-            'pcp',
-            'pandu',
-            'wahana',
-            'sicepat',
-            'jnt',
-            'pahala',
             'cahaya',
-            'sap',
-            'jet',
-            'indah',
-            'slis',
-            'expedito*',
             'dse',
+            'esl',
+            'expedito*',
             'first',
+            'ide',
+            'idl',
+            'indah',
+            'jet',
+            'jne',
+            'jnt',
+            'lion',
             'ncs',
+            'ninja',
+            'pahala',
+            'pandu',
+            'pcp',
+            'pos',
+            'rex',
+            'rpx',
+            'sap',
+            'sentral',
+            'sicepat',
+            'slis',
             'star',
+            'tiki',
+            'wahana',
         ],
     ];
 
@@ -115,21 +121,10 @@ class RajaOngkir
     protected $supportedWayBills = [
         'starter' => [],
         'basic' => [
-            'jne',
+            []
         ],
         'pro' => [
-            'jne',
-            'pos',
-            'tiki',
-            'pcp',
-            'rpx',
-            'wahana',
-            'sicepat',
-            'j&t',
-            'sap',
-            'jet',
-            'dse',
-            'first',
+            'pos', 'wahana', 'jnt', 'sap', 'sicepat', 'jet', 'dse', 'first', 'ninja', 'lion', 'idl', 'rex', 'ide', 'sentral'
         ],
     ];
 
@@ -214,10 +209,10 @@ class RajaOngkir
      *
      * @param string $apiKey RajaOngkir API Key
      *
-     * @access  public
      * @return  static
+     * @access  public
      */
-    public function setApiKey($apiKey)
+    public function setApiKey(string $apiKey)
     {
         $this->apiKey = $apiKey;
 
@@ -231,11 +226,11 @@ class RajaOngkir
      *
      * @param string $accountType RajaOngkir Account Type, can be starter, basic or pro
      *
-     * @access  public
      * @return  static
-     * @throws  \InvalidArgumentException
+     * @throws \InvalidArgumentException
+     * @access  public
      */
-    public function setAccountType($accountType)
+    public function setAccountType(string $accountType)
     {
         $accountType = strtolower($accountType);
 
@@ -311,29 +306,27 @@ class RajaOngkir
                 $this->errors[404] = 'Page Not Found!';
             } else {
                 $content = $body->getContents();
-                $json = json_decode($content,true);
+                $json = json_decode($content, true);
 
                 $status = $request->getStatusCode();;
 
-                if ($status ===200){
+                if ($status === 200) {
                     $body = $json['rajaongkir'];
-                    if (isset($body['results'])){
-                        if (count($body[ 'results' ]) == 1 && isset($body[ 'results' ][ 0 ])) {
-                            return $body[ 'results' ][ 0 ];
-                        } elseif (count($body[ 'results' ])) {
-                            return $body[ 'results' ];
-                        }else{
+                    if (isset($body['results'])) {
+                        if (count($body['results']) == 1 && isset($body['results'][0])) {
+                            return $body['results'][0];
+                        } elseif (count($body['results'])) {
+                            return $body['results'];
+                        } else {
 
                         }
-                    }elseif (isset($body[ 'result' ])) {
-                        return $body[ 'result' ];
+                    } elseif (isset($body['result'])) {
+                        return $body['result'];
                     }
-                }else{
-                    $this->errors[ $status[ 'code' ] ] = $status[ 'description' ];
+                } else {
+                    $this->errors[$status['code']] = $status['description'];
                 }
             }
-
-
 
 
         } catch (RequestException $e) {
@@ -347,7 +340,7 @@ class RajaOngkir
                 'errors' => $e
             ];
 
-            if (env('APP_DEBUG')){
+            if (env('APP_DEBUG')) {
                 return $response;
             }
         }
@@ -381,7 +374,7 @@ class RajaOngkir
      * Get list of provinces.
      *
      * @access  public
-     * @return  void Returns FALSE if failed.
+     * @return array|\Psr\Http\Message\ResponseInterface|void
      */
     public function getProvinces()
     {
@@ -400,7 +393,8 @@ class RajaOngkir
      * @param int $idProvince Province ID
      *
      * @access  public
-     * @return  void Returns FALSE if failed.
+     * @return array|\Psr\Http\Message\ResponseInterface|void
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getProvince($idProvince)
     {
@@ -416,7 +410,7 @@ class RajaOngkir
      * @param int $idProvince Province ID
      *
      * @access  public
-     * @return  void Returns FALSE if failed.
+     * @return array|\Psr\Http\Message\ResponseInterface|void
      */
     public function getCities($idProvince = null)
     {
@@ -459,7 +453,8 @@ class RajaOngkir
      * @param int $idCity City ID
      *
      * @access  public
-     * @return  void | false Returns FALSE if failed.
+     * @return array|false|\Psr\Http\Message\ResponseInterface|void
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getSubdistricts($idCity)
     {
@@ -649,6 +644,9 @@ class RajaOngkir
      */
     public function getCost(array $origin, array $destination, $metrics, $courier)
     {
+        if (is_array($courier)) {
+            $courier = implode(':', $courier);
+        }
         $params['courier'] = strtolower($courier);
 
         $params['originType'] = strtolower(key($origin));
