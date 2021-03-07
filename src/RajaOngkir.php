@@ -11,7 +11,9 @@
 namespace Dankerizer\RajaOngkir;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 class RajaOngkir
 {
@@ -173,9 +175,21 @@ class RajaOngkir
     protected $response;
 
 
+    /**
+     * @var array
+     * Response Error
+     * @access public
+     * @type array
+     */
     public $errors = [];
 
 
+    /**
+     * RajaOngkir constructor.
+     * @param null $apiKey
+     * @param null $accountType
+     *
+     */
     public function __construct($apiKey = null, $accountType = null)
     {
         if (isset($apiKey)) {
@@ -276,7 +290,7 @@ class RajaOngkir
      * @param $path
      * @param array $params
      * @param string $method
-     * @return array|\Psr\Http\Message\ResponseInterface
+     * @return array|ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function request($path, $params = [], $method = 'GET')
@@ -330,14 +344,16 @@ class RajaOngkir
 
 
         } catch (RequestException $e) {
+
             $response = [
                 'status' => [
-                    'code' => 100,
+                    'code' => 501,
                     'message' => 'data-not-found',
                     'description' => 'Invalid waybill or courier'
                 ],
-                'key' => $this->apiKey,
-                'errors' => $e
+//                'key' => $this->apiKey,
+                'errors' => $e,
+
             ];
 
             if (env('APP_DEBUG')) {
@@ -350,6 +366,9 @@ class RajaOngkir
     }
 
 
+    /**
+     * @param $response
+     */
     protected function validate_response($response)
     {
 
@@ -374,8 +393,10 @@ class RajaOngkir
      * Get list of provinces.
      *
      * @access  public
-     * @return array|\Psr\Http\Message\ResponseInterface|void
+     * @return array|ResponseInterface|void
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
+
     public function getProvinces()
     {
         return $this->request('province');
@@ -393,7 +414,7 @@ class RajaOngkir
      * @param int $idProvince Province ID
      *
      * @access  public
-     * @return array|\Psr\Http\Message\ResponseInterface|void
+     * @return array|ResponseInterface|void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getProvince($idProvince)
@@ -410,7 +431,7 @@ class RajaOngkir
      * @param int $idProvince Province ID
      *
      * @access  public
-     * @return array|\Psr\Http\Message\ResponseInterface|void
+     * @return array|ResponseInterface|void
      */
     public function getCities($idProvince = null)
     {
@@ -453,7 +474,7 @@ class RajaOngkir
      * @param int $idCity City ID
      *
      * @access  public
-     * @return array|false|\Psr\Http\Message\ResponseInterface|void
+     * @return array|false|ResponseInterface|void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getSubdistricts($idCity)
@@ -630,7 +651,7 @@ class RajaOngkir
      * @param string $courier Courier Code
      *
      * @access   public
-     * @return  array|bool Returns FALSE if failed.
+     * @return array|bool|\Exception|GuzzleException
      * @see      http://rajaongkir.com/dokumentasi/pro
      *
      * @example
@@ -694,7 +715,7 @@ class RajaOngkir
 
                     return false;
                 } elseif ($params['originType'] === 'subdistrict' or $params['destinationType'] === 'subdistrict') {
-                    $this->errors[302] = 'Unsupported Subdistrict Origin-Destination. Tipe akun starter tidak mendukung pengecekan ongkos kirim sampai kecamatan.';
+                    $this->errors[302] = 'Unsupported Sub-district Origin-Destination. Tipe akun starter tidak mendukung pengecekan ongkos kirim sampai kecamatan.';
 
                     return false;
                 }
@@ -758,8 +779,11 @@ class RajaOngkir
         $params['destination'] = $destination[key($destination)];
 
         $path = key($destination) === 'country' ? 'internationalCost' : 'cost';
-//return  compact('params','path');
-        return $this->request($path, $params, 'POST');
+        try {
+            return $this->request($path, $params, 'POST');
+        } catch (GuzzleException $e) {
+            return $e;
+        }
     }
 
 
