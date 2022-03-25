@@ -149,7 +149,7 @@ class RajaOngkir
         'pandu' => 'Pandu Logistics (PANDU)',
         'wahana' => 'Wahana Prestasi Logistik (WAHANA)',
         'sicepat' => 'SiCepat Express (SICEPAT)',
-        'j&t' => 'J&T Express (J&T)',
+        'jnt' => 'J&T Express (J&T)',
         'pahala' => 'Pahala Kencana Express (PAHALA)',
         'cahaya' => 'Cahaya Logistik (CAHAYA)',
         'sap' => 'SAP Express (SAP)',
@@ -215,6 +215,16 @@ class RajaOngkir
         $this->httpClient = new Client(['base_uri' => $this->api_url]);
     }
 
+
+    public function info(){
+
+        return [
+            'api_key'=>$this->apiKey,
+            'url'=>$this->api_url,
+            'account_type'=>$this->accountType,
+
+        ];
+    }
 
     /**
      * RajaOngkir::setApiKey
@@ -330,6 +340,7 @@ class RajaOngkir
                         if (count($body['results']) == 1 && isset($body['results'][0])) {
                             return $body['results'][0];
                         } elseif (count($body['results'])) {
+
                             return $body['results'];
                         } else {
 
@@ -346,19 +357,21 @@ class RajaOngkir
         } catch (RequestException $e) {
 
             $response = [
+                'success'=>false,
                 'status' => [
                     'code' => 501,
                     'message' => 'data-not-found',
                     'description' => 'Invalid waybill or courier'
                 ],
-//                'key' => $this->apiKey,
-                'errors' => $e,
+
 
             ];
 
             if (env('APP_DEBUG')) {
-                return $response;
+                $response['errors'] = $e;
+
             }
+            return $response;
         }
 
 
@@ -669,6 +682,7 @@ class RajaOngkir
             $courier = implode(':', $courier);
         }
         $params['courier'] = strtolower($courier);
+
 
         $params['originType'] = strtolower(key($origin));
         $params['destinationType'] = strtolower(key($destination));
