@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 
 class RajaOngkirController extends Controller{
 
+    /**
+     * @var RajaOngkir
+     */
     protected $client;
+
     public function __construct() {
         $key = env('RAJAONGKIR_API_KEY');
         $accountType = env('RAJAONGKIR_ACCOUNT_TYPE','pro');
@@ -29,6 +33,10 @@ class RajaOngkirController extends Controller{
         ];
 
        return $this->client->getCost($origin,$destination,$metrics,$request['courier']);
+
+    }
+
+    public function getWaybill(Request $request){
 
     }
 }
