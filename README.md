@@ -2,6 +2,12 @@
   
 PHP Library untuk mengakses API RajaOngkir dengan mudah
 
+Cara install
+
+```shell
+composer require dankerizer/rajaongkir
+```
+
 ##### Fitur
 - [x] Daftar semua provinsi.
 - [x] Ambil provinsi berdasarkan ID.
