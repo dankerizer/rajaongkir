@@ -20,10 +20,13 @@ class RajaOngkirController extends Controller{
 
     public function get_cost( $request){
 
-        $metrics = isset($request['weight']) ? abs($request['weight']) : 0;
+        $metrics =  0;
         if (isset($request['metrics'])){
             $metrics = $request['metrics'];
+        }elseif (isset($request['weight'])){
+            $metrics = abs( $request['weight']);
         }
+
         $origin = [
             'subdistrict' => isset($request['origin']) ? abs($request['origin']) : null,
         ];
